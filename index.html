@@ -70,10 +70,11 @@
         
         const message = document.getElementById('message');
         const downloadBtn = document.getElementById('downloadBtn');
+        const PACKAGE_NAME = 'com.flutter.real_estate';
         
         if (id) {
             // Android Intent URL (most reliable method)
-            const intentUrl = `intent://property/${id}#Intent;scheme=myproperty.app;package=com.yourcompany.myproperty;end`;
+            const intentUrl = `intent://property/${id}#Intent;scheme=myproperty.app;package=${PACKAGE_NAME};end`;
             
             // Try multiple methods for better compatibility
             
