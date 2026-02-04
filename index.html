@@ -61,7 +61,30 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
+const encId = urlParams.get('p');
+
+const secretKey = "MySecretKey123!@#";
+const secretIv = "MySecretIV456$%^";
+
+function decryptId(encryptedId) {
+    const key = CryptoJS.SHA256(secretKey);
+    const iv = CryptoJS.SHA256(secretIv).toString().substring(0, 32);
+    
+    const decrypted = CryptoJS.AES.decrypt(
+        encryptedId,
+        key,
+        {
+            iv: CryptoJS.enc.Hex.parse(iv),
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        }
+    );
+    
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+// Decrypt the ID from URL parameter
+const id = decryptId(encId);
         const message = document.getElementById('message');
         const downloadBtn = document.getElementById('downloadBtn');
         const spinner = document.getElementById('spinner');
