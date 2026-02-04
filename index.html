@@ -64,29 +64,66 @@
         const urlParams = new URLSearchParams(window.location.search);
 const encId = urlParams.get('p');
 
+console.log("Step 1 - Encrypted ID from URL:", encId);
+
 const secretKey = "MySecretKey123!@#";
 const secretIv = "MySecretIV456$%^";
 
 function decryptId(encryptedId) {
-    const key = CryptoJS.SHA256(secretKey);
-    const iv = CryptoJS.SHA256(secretIv).toString().substring(0, 32);
+    if (!encryptedId) {
+        console.error("No encrypted ID provided");
+        return null;
+    }
     
-    const decrypted = CryptoJS.AES.decrypt(
-        encryptedId,
-        key,
-        {
-            iv: CryptoJS.enc.Hex.parse(iv),
-            mode: CryptoJS.mode.CBC,
-            padding: CryptoJS.pad.Pkcs7
+    try {
+        // Hash key and IV to match PHP
+        const key = CryptoJS.SHA256(secretKey);
+        const ivHash = CryptoJS.SHA256(secretIv);
+        
+        // Get first 16 bytes (128 bits) of IV hash as hex
+        const iv = CryptoJS.lib.WordArray.create(ivHash.words.slice(0, 4));
+        
+        console.log("Step 2 - Key length:", key.words.length);
+        console.log("Step 3 - IV length:", iv.words.length);
+        
+        // Decrypt
+        const decrypted = CryptoJS.AES.decrypt(
+            encryptedId,
+            key,
+            {
+                iv: iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            }
+        );
+        
+        console.log("Step 4 - Decrypted WordArray:", decrypted);
+        
+        const result = decrypted.toString(CryptoJS.enc.Utf8);
+        
+        if (!result) {
+            console.error("Step 5 - Decryption resulted in empty string");
+            console.error("Check: 1) CryptoJS loaded? 2) Correct key/IV? 3) PHP encryption format?");
+        } else {
+            console.log("Step 5 - Decryption successful!");
         }
-    );
-    
-    return decrypted.toString(CryptoJS.enc.Utf8);
+        
+        return result;
+        
+    } catch (error) {
+        console.error("Decryption error:", error);
+        return null;
+    }
 }
 
 // Decrypt the ID from URL parameter
-const id = decryptId(encId);
-        console.log("ID: ", id);
+if (encId) {
+    const id = decryptId(encId);
+    console.log("Final Decrypted ID:", id);
+} else {
+    console.error("No 'p' parameter found in URL");
+}
+
         const message = document.getElementById('message');
         const downloadBtn = document.getElementById('downloadBtn');
         const spinner = document.getElementById('spinner');
