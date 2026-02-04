@@ -116,14 +116,7 @@ function decryptId(encryptedId) {
     }
 }
 
-// Decrypt the ID from URL parameter
-if (encId) {
-    const id = decryptId(encId);
-    console.log("Final Decrypted ID:", id);
-} else {
-    console.error("No 'p' parameter found in URL");
-}
-
+        const id = decryptId(encId);
         const message = document.getElementById('message');
         const downloadBtn = document.getElementById('downloadBtn');
         const spinner = document.getElementById('spinner');
